@@ -202,7 +202,6 @@
             const swipeThreshold = 50; // The threshold in pixels to distinguish a SWIPE from a TAP/CLICK
 
             let halloweenModeActive = false;
-            // Removed currentIsDragging variable and logic
             const tapTolerance = 10; // This variable is now redundant but kept for consistency with previous changes
 
 
@@ -360,12 +359,11 @@
                 startAudioContext(); 
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
-                // Removed currentIsDragging logic as it was confusing the touch decision
-            }, { passive: true });
+            }, { passive: true }); // passive: true is fine here
 
             container.addEventListener('touchmove', (e) => {
                 // Keeping this listener but removing its logic to avoid interference.
-            }, { passive: true });
+            }, { passive: true }); // passive: true is fine here
 
             container.addEventListener('touchend', (e) => {
                 const endX = e.changedTouches[0].clientX;
@@ -374,19 +372,20 @@
                 const absDiffX = Math.abs(endX - startX);
                 const absDiffY = Math.abs(endY - startY);
 
-                // FIX: If the movement is less than the swipe threshold (50px), it's treated as a tap/toggle.
                 if (absDiffX >= swipeThreshold || absDiffY >= swipeThreshold) { 
                     // 1. It was a significant drag, treat as SWIPE
                     processSwipe(endX, endY);
                 } else {
                     // 2. It was a small movement/tap, treat as TOGGLE
                     toggleHalloweenMode();
+                    // FIX: Prevent the browser from synthesizing a 'click' event (and subsequent mouse events)
+                    e.preventDefault(); 
                 }
                 
                 // Ensure start coordinates are reset for the next touch event regardless of the action taken.
                 startX = 0; 
                 startY = 0; 
-            }, { passive: true });
+            }, { passive: false }); // CHANGED: Must be passive: false for e.preventDefault() to work
 
             // MOUSE EVENTS (These were already correct)
             container.addEventListener('mousedown', (e) => {
