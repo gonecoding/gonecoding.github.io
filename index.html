@@ -176,7 +176,15 @@
                     Tone.start().then(() => {
                         console.log("Audio Context Started");
                         audioContextStarted = true;
-                        setupSound(); // Setup sound only after context is running
+                        setupSound(); 
+                        
+                        // NEW: Request Fullscreen on the same user gesture that started the audio
+                        if (document.documentElement.requestFullscreen) {
+                            document.documentElement.requestFullscreen().catch(err => {
+                                console.log("Fullscreen request denied or failed:", err);
+                            });
+                        }
+
                     }).catch(err => {
                         console.error("Failed to start Audio Context:", err);
                     });
@@ -198,7 +206,6 @@
 
             let startX = 0;
             let startY = 0;
-            // Removed mouse-specific and conflict-management variables (isDragging, lastTouchTime, MOUSE_SYNTHESIS_DELAY)
             const swipeThreshold = 50; 
 
             let halloweenModeActive = false;
