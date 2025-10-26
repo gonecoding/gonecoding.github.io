@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fullscreen Color Swiper</title>
+    <!-- PWA Meta Tags for iOS Fullscreen/Standalone Mode -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SpookyColor">
+    <meta name="mobile-web-app-capable" content="yes">
+
     <!-- Load Tailwind CSS for simple styling and responsiveness --><script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
     <style>
@@ -178,7 +184,8 @@
                         audioContextStarted = true;
                         setupSound(); 
                         
-                        // NEW: Request Fullscreen on the same user gesture that started the audio
+                        // NOTE: This standard API call often fails on Mobile Safari/iOS devices
+                        // but is kept for compatibility with other touch-enabled browsers.
                         if (document.documentElement.requestFullscreen) {
                             document.documentElement.requestFullscreen().catch(err => {
                                 console.log("Fullscreen request denied or failed:", err);
