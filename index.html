@@ -175,6 +175,18 @@
                     }
                 }).toDestination();
             }
+            
+            // NEW: Function to handle fullscreen request
+            function goFullscreen() {
+                // Check if already in fullscreen to avoid errors
+                if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+                    // NOTE: This standard API call often fails on Mobile Safari/iOS devices
+                    // but is kept for compatibility with other touch-enabled browsers.
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log("Fullscreen request denied or failed:", err);
+                    });
+                }
+            }
 
             // Start the audio context on the first user interaction
             function startAudioContext() {
@@ -183,15 +195,6 @@
                         console.log("Audio Context Started");
                         audioContextStarted = true;
                         setupSound(); 
-                        
-                        // NOTE: This standard API call often fails on Mobile Safari/iOS devices
-                        // but is kept for compatibility with other touch-enabled browsers.
-                        if (document.documentElement.requestFullscreen) {
-                            document.documentElement.requestFullscreen().catch(err => {
-                                console.log("Fullscreen request denied or failed:", err);
-                            });
-                        }
-
                     }).catch(err => {
                         console.error("Failed to start Audio Context:", err);
                     });
@@ -222,8 +225,10 @@
             let startX = 0;
             let startY = 0;
             const swipeThreshold = 50; 
+            const doubleTapThreshold = 300; // 300ms window for double tap
 
             let halloweenModeActive = false;
+            let lastTapTime = 0; // NEW: Variable to track the time of the last tap
 
             let booTimeout = null;
 
@@ -387,6 +392,7 @@
             container.addEventListener('touchend', (e) => {
                 const endX = e.changedTouches[0].clientX;
                 const endY = e.changedTouches[0].clientY;
+                const currentTime = Date.now();
                 
                 const absDiffX = Math.abs(endX - startX);
                 const absDiffY = Math.abs(endY - startY);
@@ -395,16 +401,25 @@
                     // 1. It was a significant drag, treat as SWIPE
                     processSwipe(endX, endY);
                 } else {
-                    // 2. It was a small movement/tap, treat as TOGGLE
-                    toggleHalloweenMode();
+                    // 2. It was a small movement/tap
+                    if (currentTime - lastTapTime < doubleTapThreshold) {
+                        // Double Tap detected -> Go Fullscreen
+                        goFullscreen();
+                        // Reset lastTapTime to avoid triple tap confusion
+                        lastTapTime = 0; 
+                        showMessage("Fullscreen Mode");
+                    } else {
+                        // Single Tap detected -> Toggle Halloween Mode
+                        toggleHalloweenMode();
+                        // Record time of this single tap
+                        lastTapTime = currentTime;
+                    }
                 }
                 
                 // Ensure start coordinates are reset for the next touch event regardless of the action taken.
                 startX = 0; 
                 startY = 0; 
             }, { passive: true });
-
-            // MOUSE EVENT LISTENERS (mousedown, mousemove, mouseup, mouseleave) have been entirely removed.
             
         });
     </script>
