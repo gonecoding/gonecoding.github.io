@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fullscreen Color Swiper</title>
-    <!-- PWA Meta Tags for iOS Fullscreen/Standalone Mode -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SpookyColor">
-    <meta name="mobile-web-app-capable" content="yes">
+    <!-- Removed PWA Meta Tags for iOS Fullscreen/Standalone Mode to simplify code -->
 
     <!-- Load Tailwind CSS for simple styling and responsiveness --><script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
@@ -176,17 +172,7 @@
                 }).toDestination();
             }
             
-            // NEW: Function to handle fullscreen request
-            function goFullscreen() {
-                // Check if already in fullscreen to avoid errors
-                if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-                    // NOTE: This standard API call often fails on Mobile Safari/iOS devices
-                    // but is kept for compatibility with other touch-enabled browsers.
-                    document.documentElement.requestFullscreen().catch(err => {
-                        console.log("Fullscreen request denied or failed:", err);
-                    });
-                }
-            }
+            // Fullscreen functionality removed.
 
             // Start the audio context on the first user interaction
             function startAudioContext() {
@@ -225,10 +211,9 @@
             let startX = 0;
             let startY = 0;
             const swipeThreshold = 50; 
-            const doubleTapThreshold = 300; // 300ms window for double tap
+            // Double-tap threshold logic and variables removed.
 
             let halloweenModeActive = false;
-            let lastTapTime = 0; // NEW: Variable to track the time of the last tap
 
             let booTimeout = null;
 
@@ -392,7 +377,6 @@
             container.addEventListener('touchend', (e) => {
                 const endX = e.changedTouches[0].clientX;
                 const endY = e.changedTouches[0].clientY;
-                const currentTime = Date.now();
                 
                 const absDiffX = Math.abs(endX - startX);
                 const absDiffY = Math.abs(endY - startY);
@@ -401,19 +385,8 @@
                     // 1. It was a significant drag, treat as SWIPE
                     processSwipe(endX, endY);
                 } else {
-                    // 2. It was a small movement/tap
-                    if (currentTime - lastTapTime < doubleTapThreshold) {
-                        // Double Tap detected -> Go Fullscreen
-                        goFullscreen();
-                        // Reset lastTapTime to avoid triple tap confusion
-                        lastTapTime = 0; 
-                        showMessage("Fullscreen Mode");
-                    } else {
-                        // Single Tap detected -> Toggle Halloween Mode
-                        toggleHalloweenMode();
-                        // Record time of this single tap
-                        lastTapTime = currentTime;
-                    }
+                    // 2. It was a small movement/tap, treat as TOGGLE (no double-tap logic)
+                    toggleHalloweenMode();
                 }
                 
                 // Ensure start coordinates are reset for the next touch event regardless of the action taken.
